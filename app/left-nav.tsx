@@ -46,6 +46,11 @@ export function LeftNav() {
         Airstack
         </p>
       </Link>
+      <div>
+        <a href="https://github.com/dabit3/lens-algorithm-playground" target="_blank" rel="no-opener">
+        <img src="/github.svg" className="w-[40px]" />
+        </a>
+      </div>
     </div>
   )
 }
