@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { LeftNav } from './left-nav'
 
 const inter = Inter({ subsets: ['latin'] })
+import Link from 'next/link'
 
 export const metadata = {
   title: 'Create Next App',
@@ -17,13 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
-        <nav
-          className="
+        <nav>
+          <Link href="/" className="
           flex border-b pl-6 flex items-center
-          "
-        >
+          ">
           <img src='/logo.svg' className="w-[50px]" />
-          <p className="">Lens Algorithm Playground</p>
+          <p className="text-slate-500">Lens Algorithm Playground</p>
+          </Link>
         </nav>
         <div className="flex">
           <LeftNav />
