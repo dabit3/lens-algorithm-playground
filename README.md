@@ -4,14 +4,20 @@ This app showcases various Lens recommendation algorithms and APIs available in 
 
 ## Supported APIs
 
-- Lens API
-- Karma3
-- MadFi
-- Airstack (soon)
+- [Lens API](https://docs.lens.xyz/docs/introduction)
+- [Karma3](https://karma3labs.com/)
+- [MadFi](https://docs.madfinance.xyz/api/suggested-follows)
+- [Airstack](https://docs.airstack.xyz/airstack-docs-and-faqs/reference/api-reference/socials-api/)
 
 ## Prerequisites
 
-You so not need any credentials to run this app. The only API that requires an API key is for MadFi. You can request one by reaching out to their team, you can learn more [here](https://docs.madfinance.xyz/)
+You so not need any credentials to run this app to interact with Lens or Karma3.
+
+The APIs that require an API key are MadFi and Airstack.
+
+You can get an Airstack API key by creating an account here.
+
+You can request one for MadFi by reaching out to their team, you can learn more [here](https://app.airstack.xyz/)
 
 ## Running the app
 
