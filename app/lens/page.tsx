@@ -160,7 +160,7 @@ export default function Home() {
       {
         view === 'global' && (
           <>
-            <p className="font-bold mt-4">Personalized API</p>
+            <p className="font-bold mt-4">Global APIs</p>
             <div>
               <p className="text-sm mt-3 mb-2 text-slate-400">Sort Criteria</p>
               <div>
@@ -246,7 +246,8 @@ export default function Home() {
       {
         view === 'personalized' && authenticated && (
           <div>
-            <div className="mt-6">
+            <p className="font-bold mt-4">Personalized feed</p>
+            <div className="mt-4">
               {
                 personalizedFeed.map(publication => (
                   <div key={publication.id} className="mb-2 [&>div>div>div>div]:pb-2">
