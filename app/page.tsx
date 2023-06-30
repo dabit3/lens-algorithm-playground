@@ -6,7 +6,7 @@ export default function Home() {
     <main className="flex flex-col items-center justify-between p-14">
       <div>
         <p>
-        The Lens Algorithm Playground is meant to give you an overview of various Lens APIs and algorithms available for developers building on Lens Protocol.
+        The Lens Algorithm Playground is meant to give you an overview of various Lens APIs and recommendation algorithms available for developers building on Lens Protocol.
         </p>
         <p className="mt-5">The currently supported APIs are linked here:</p>
         
