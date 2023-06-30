@@ -19,9 +19,10 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <nav
           className="
-          flex py-4 border-b pl-6
+          flex border-b pl-6 flex items-center
           "
         >
+          <img src='/logo.svg' className="w-[50px]" />
           <p className="">Lens Algorithm Playground</p>
         </nav>
         <div className="flex">

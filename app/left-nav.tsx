@@ -22,14 +22,6 @@ export function LeftNav() {
         Karma3
         </p>
       </Link>
-      <Link href="/airstack">
-        <p className={`
-          mb-2 rounded-lg px-3 py-2 ${segment === 'airstack' ? 
-          "bg-slate-100	text-black" : 'text-gray-400 '}
-        `}>
-        Airstack
-        </p>
-      </Link>
       <Link href="/madfi">
         <p className={`
           mb-2 rounded-lg px-3 py-2 ${segment === 'madfi' ?
@@ -44,6 +36,14 @@ export function LeftNav() {
           "bg-slate-100text-black" : 'text-gray-400 '}
         `}>
         Lens
+        </p>
+      </Link>
+      <Link href="/airstack">
+        <p className={`
+          mb-2 rounded-lg px-3 py-2 ${segment === 'airstack' ? 
+          "bg-slate-100	text-black" : 'text-gray-400 '}
+        `}>
+        Airstack
         </p>
       </Link>
     </div>

@@ -27,6 +27,7 @@ export function ProfileAPIs() {
   }, [strategy])
   async function fetchProfileScore() {
     if (!handle) return
+    setIsLoading(true)
     try {
       const uri = `https://lens-api.k3l.io/profile/score?strategy=${strategy}&handle=${handle}`
       const response = await fetch(uri)
@@ -34,8 +35,10 @@ export function ProfileAPIs() {
       console.log('json: ', json)
       const score = Math.round(json.score * 100000) / 100000
       setScore(score)
+      setIsLoading(false)
     } catch (err) {
-
+      setIsLoading(false)
+      console.log('error:', err)
     }
   }
   async function fetchProfileScores() {
@@ -86,7 +89,11 @@ export function ProfileAPIs() {
       <p className="text-sm mt-3 text-slate-400">APIs</p>
       <div className="mt-2">
         <button
-          onClick={() => setType('profile-scores')}
+          onClick={() => {
+            setType('profile-scores')
+            setScore(undefined)
+            setHandle('')
+          }}
         >
           <p className={`
           mr-2 text-sm text-white px-4 py-1 rounded-full
@@ -140,13 +147,13 @@ export function ProfileAPIs() {
                   <a
                   target="_blank" rel="no-opener"
                   href="https://openapi.lens.k3l.io/#/default/getScores">/profile/scores</a></span> endpoint retrieves a list of global <br /> profile scores on the Lens ecosystem</p>
-                <div className='mt-3'>
+                <div>
                 {
-                  !isLoading ? profiles.map((profile, index) => (
+                  !isLoading && profiles.map((profile, index) => (
                     <div onClick={() => {
                       setCurrentProfile(profile.handle)
                       setSelectedIndex(index)
-                    }} key={profile.handle} className="flex items-center cursor-pointer">
+                    }} key={profile.handle} className="mt-3 flex items-center cursor-pointer">
                       <p className='text-slate-400 text-sm'>{profile.rank}</p>
                       <p className={`
                       ml-3
@@ -154,7 +161,7 @@ export function ProfileAPIs() {
                       `}>{profile.handle}</p>
                       <p className='ml-3 text-slate-600 text-sm'>Score - {Math.round(profile.score * 100000) / 100000}</p>
                     </div>
-                  )) : (<Loading />)
+                  ))
                 }
                 </div>
               </div>
@@ -169,6 +176,9 @@ export function ProfileAPIs() {
           }
         </div>
       </div>
+      {
+        isLoading && <Loading className="mt-4" />
+      }
     </div>
   )
 }
