@@ -7,6 +7,25 @@ export const client = new ApolloClient({
   cache: new InMemoryCache()
 })
 
+export const getSocials = gql`
+query GetSocials($address: [Identity!]) {
+  Socials(
+    input: {filter: {identity: {_in: $address}}, blockchain: ethereum}
+  ) {
+    Social {
+      profileName
+      dappName
+    }
+  }
+  Domains(input: {filter: {owner: {_in: $address}}, blockchain: ethereum}) {
+    Domain {
+      dappName
+      name
+    }
+  }
+}
+`
+
 export const challenge = gql`
   query Challenge($address: EthereumAddress!) {
     challenge(request: { address: $address }) {

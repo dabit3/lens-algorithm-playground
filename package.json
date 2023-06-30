@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@airstack/airstack-react": "^0.4.2",
     "@apollo/client": "^3.7.16",
     "@lens-protocol/widgets-react": "^0.0.18",
     "@types/node": "20.3.2",
