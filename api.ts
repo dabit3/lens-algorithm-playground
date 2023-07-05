@@ -56,8 +56,6 @@ export const getRecommendationsByTokenTransfers = gql`
             profileName
           }
         }
-        type
-        blockchain
       }
     }
     # second query on Polygon
@@ -69,14 +67,6 @@ export const getRecommendationsByTokenTransfers = gql`
       }
     ) {
       TokenTransfer {
-        amount
-        formattedAmount
-        blockTimestamp
-        token {
-          symbol
-          name
-          decimals
-        }
         from {
           identity
           socials {
@@ -98,8 +88,6 @@ export const getRecommendationsByTokenTransfers = gql`
             dappName
           }
         }
-        type
-        blockchain
       }
     }
   }
