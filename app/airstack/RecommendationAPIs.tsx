@@ -4,7 +4,11 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { Loading } from "../components/Loading";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { getRecommendationsByTokenTransfers } from "../../api";
+import {
+  getNFTHolders,
+  getNFTs,
+  getRecommendationsByTokenTransfers,
+} from "../../api";
 
 const URI = "https://api.airstack.xyz/gql";
 
@@ -23,13 +27,68 @@ export function RecommendationAPIs() {
     if (!lensHandle || !lensHandle.includes(".lens")) return;
     setFollowList([]);
     try {
+      setLoading(true);
       switch (recommendMode) {
         case "nfts":
+          const { data: nftsData } = await client.query({
+            query: getNFTs,
+            variables: {
+              address: lensHandle,
+            },
+            context: {
+              headers: {
+                authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
+              },
+            },
+          });
+          const { ethereum: ethereumNFTsData, polygon: polygonNFTsData } =
+            nftsData || {};
+          const { TokenBalance: ethereumTokenBalances } =
+            ethereumNFTsData || {};
+          const { TokenBalance: polygonTokenBalances } = polygonNFTsData || {};
+          const { data: nftHoldersData } = await client.query({
+            query: getNFTHolders,
+            variables: {
+              // List of NFT held by `lensHandle`
+              address: [
+                ...(ethereumTokenBalances ?? [])?.map(
+                  ({ tokenAddress }) => tokenAddress
+                ),
+                ...(polygonTokenBalances ?? [])?.map(
+                  ({ tokenAddress }) => tokenAddress
+                ),
+              ],
+            },
+            context: {
+              headers: {
+                authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
+              },
+            },
+          });
+          const { ethereum: ethereumNFTHolders, polygon: polygonNFTHolders } =
+            nftHoldersData || {};
+          setFollowList(
+            [
+              ...(ethereumNFTHolders?.TokenNft ?? []),
+              ...(polygonNFTHolders?.TokenNft ?? []),
+            ]
+              ?.map(({ tokenBalances }) => {
+                if (!tokenBalances) return;
+                return tokenBalances?.map(
+                  ({ owner }) =>
+                    owner?.socials?.find(({ dappName }) => dappName === "lens")
+                      ?.profileName
+                );
+              })
+              ?.flat(1)
+              ?.filter(Boolean)
+              ?.filter((value, index, array) => array.indexOf(value) === index)
+          );
+          break;
         case "poaps":
         case "transfers":
         default:
-          setLoading(true);
-          const { data } = await client.query({
+          const { data: tokenTransfersData } = await client.query({
             query: getRecommendationsByTokenTransfers,
             variables: {
               address: lensHandle,
@@ -40,7 +99,7 @@ export function RecommendationAPIs() {
               },
             },
           });
-          const { ethereum, polygon } = data || {};
+          const { ethereum, polygon } = tokenTransfersData || {};
           const { TokenTransfer: ethereumTokenTransfers } = ethereum || {};
           const { TokenTransfer: polygonTokenTransfers } = polygon || {};
           setFollowList(
@@ -76,9 +135,9 @@ export function RecommendationAPIs() {
               // Filter to only get unique value
               .filter((value, index, array) => array.indexOf(value) === index)
           );
-          setLoading(false);
           break;
       }
+      setLoading(false);
     } catch (err) {
       console.log("error fetching follow recommendation ...", err);
       setLoading(false);

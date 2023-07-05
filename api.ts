@@ -93,6 +93,80 @@ export const getRecommendationsByTokenTransfers = gql`
   }
 `;
 
+export const getNFTs = gql`
+  query GetNFTs($address: [Identity!]) {
+    ethereum: TokenBalances(
+      input: {
+        filter: {
+          owner: { _in: $address }
+          tokenType: { _in: [ERC1155, ERC721] }
+        }
+        blockchain: ethereum
+        limit: 20
+      }
+    ) {
+      TokenBalance {
+        tokenAddress
+      }
+    }
+    polygon: TokenBalances(
+      input: {
+        filter: {
+          owner: { _in: $address }
+          tokenType: { _in: [ERC1155, ERC721] }
+        }
+        blockchain: polygon
+        limit: 10
+      }
+    ) {
+      TokenBalance {
+        tokenAddress
+      }
+    }
+  }
+`;
+
+export const getNFTHolders = gql`
+  query GetNFTHolders($address: [Address!]) {
+    ethereum: TokenNfts(
+      input: {
+        filter: { address: { _in: $address } }
+        blockchain: ethereum
+        limit: 200
+      }
+    ) {
+      TokenNft {
+        tokenBalances {
+          owner {
+            socials {
+              profileName
+              dappName
+            }
+          }
+        }
+      }
+    }
+    polygon: TokenNfts(
+      input: {
+        filter: { address: { _in: $address } }
+        blockchain: ethereum
+        limit: 200
+      }
+    ) {
+      TokenNft {
+        tokenBalances {
+          owner {
+            socials {
+              profileName
+              dappName
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const challenge = gql`
   query Challenge($address: EthereumAddress!) {
     challenge(request: { address: $address }) {
