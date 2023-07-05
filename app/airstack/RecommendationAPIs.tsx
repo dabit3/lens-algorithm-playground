@@ -14,13 +14,13 @@ const client = new ApolloClient({
 });
 
 export function RecommendationAPIs() {
-  const [recommendMode, setRecommendMode] = useState("nfts");
+  const [recommendMode, setRecommendMode] = useState("transfers");
   const [lensHandle, setLensHandle] = useState("");
   const [loading, setLoading] = useState(false);
   const [followList, setFollowList] = useState<any[]>([]);
 
   const fetchRecommendations = async () => {
-    if (!lensHandle) return;
+    if (!lensHandle || !lensHandle.includes(".lens")) return;
     setFollowList([]);
     try {
       switch (recommendMode) {
@@ -41,25 +41,32 @@ export function RecommendationAPIs() {
             },
           });
           const { ethereum, polygon } = data || {};
-          const { TokenTransfer: ethereumTokenTransfers = [] } = ethereum || {};
-          const { TokenTransfer: polygonTokenTransfers = [] } = polygon || {};
+          const { TokenTransfer: ethereumTokenTransfers } = ethereum || {};
+          const { TokenTransfer: polygonTokenTransfers } = polygon || {};
           setFollowList(
-            [...ethereumTokenTransfers, ...polygonTokenTransfers]
+            [
+              ...(ethereumTokenTransfers ?? []),
+              ...(polygonTokenTransfers ?? []),
+            ]
               .map((transfer) => {
                 if (
-                  transfer?.from?.socials?.find?.(
+                  !transfer?.from?.socials?.find?.(
                     ({ profileName }) =>
-                      profileName !== lensHandle.toLocaleLowerCase()
+                      profileName === lensHandle.toLowerCase()
                   )
                 ) {
-                  return transfer?.from?.socials?.[0]?.profileName;
+                  return transfer?.from?.socials?.find(
+                    ({ dappName }) => dappName === "lens"
+                  )?.profileName;
                 } else if (
-                  transfer?.to?.socials?.find?.(
+                  !transfer?.to?.socials?.find?.(
                     ({ profileName }) =>
-                      profileName !== lensHandle.toLocaleLowerCase()
+                      profileName === lensHandle.toLowerCase()
                   )
                 ) {
-                  return transfer?.to?.socials?.[0]?.profileName;
+                  return transfer?.to?.socials?.find(
+                    ({ dappName }) => dappName === "lens"
+                  )?.profileName;
                 } else {
                   return;
                 }
@@ -78,14 +85,19 @@ export function RecommendationAPIs() {
     }
   };
 
-  console.log(followList);
-
   return (
     <div>
       <p className="font-bold mt-4">Recommendation Engine</p>
       <div>
         <p className="text-sm mt-3 mb-2 text-slate-400">Recommend By</p>
         <div>
+          <Button
+            text="Token Transfers"
+            onClick={() => setRecommendMode("transfers")}
+            className={`
+            ${recommendMode === "transfers" ? "bg-purple-500" : "bg-purple-400"}
+            `}
+          />
           <Button
             text="NFTs"
             onClick={() => setRecommendMode("nfts")}
@@ -98,13 +110,6 @@ export function RecommendationAPIs() {
             onClick={() => setRecommendMode("poaps")}
             className={`
             ${recommendMode === "poaps" ? "bg-purple-500" : "bg-purple-400"}
-            `}
-          />
-          <Button
-            text="Token Transfers"
-            onClick={() => setRecommendMode("transfers")}
-            className={`
-            ${recommendMode === "transfers" ? "bg-purple-500" : "bg-purple-400"}
             `}
           />
         </div>
@@ -124,9 +129,9 @@ export function RecommendationAPIs() {
         />
       </div>
       <div className="mt-3 p-2">
-        {recommendMode === "nfts" && <div>NFTs</div>}
-        {recommendMode === "poaps" && <div>POAPs</div>}
-        {recommendMode === "transfers" && <div></div>}
+        {followList.map((lensProfile, index) => (
+          <p key={index}>{lensProfile}</p>
+        ))}
         {loading && <Loading className="mt-4" />}
       </div>
     </div>
