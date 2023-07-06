@@ -1,14 +1,10 @@
 "use client";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { Loading } from "../components/Loading";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import {
-  getNFTHolders,
-  getNFTs,
-  getRecommendationsByTokenTransfers,
-} from "../../api";
+import { getNFTHolders, getNFTs, getPoapHolders, getPoaps } from "../../api";
 import Modal from "react-modal";
 
 const URI = "https://api.airstack.xyz/gql";
@@ -23,9 +19,9 @@ const EnhancementAPIs = () => {
   const [lensHandle, setLensHandle] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
-  const [profileGroups, setProfileGroups] = useState<any[]>([]);
-  const [focusGroup, setFocusGroup] = useState<string>("");
-  const [groupUsers, setGroupUsers] = useState<any[]>([]);
+  const [profileGroups, setProfileGroups] = useState<any[]>([]); // List of relevant groups
+  const [focusGroup, setFocusGroup] = useState<string>(""); // NFT or POAP that are focused
+  const [groupUsers, setGroupUsers] = useState<any[]>([]); // List of users in the focused group
 
   const fetchProfileGroups = async () => {
     if (!lensHandle || !lensHandle.includes(".lens")) return;
@@ -57,6 +53,25 @@ const EnhancementAPIs = () => {
           break;
         case "poaps":
         default:
+          const { data: poapsData } = await client.query({
+            query: getPoaps,
+            variables: {
+              address: lensHandle,
+            },
+            context: {
+              headers: {
+                authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
+              },
+            },
+          });
+          const { Poaps } = poapsData || {};
+          setProfileGroups(
+            Poaps?.Poap?.map(({ eventId, poapEvent }) => ({
+              eventId,
+              image: poapEvent?.contentValue?.image?.small,
+              name: poapEvent?.eventName,
+            }))
+          );
           break;
       }
       setLoading(false);
@@ -66,43 +81,72 @@ const EnhancementAPIs = () => {
     }
   };
 
-  const fetchProfileUsers = async (nftAddress) => {
+  const fetchProfileUsers = async ({ nftAddress, eventId }) => {
     setModalLoading(true);
-    setFocusGroup(nftAddress);
     setGroupUsers([]);
     try {
-      const { data: nftHoldersData } = await client.query({
-        query: getNFTHolders,
-        variables: {
-          address: [nftAddress],
-        },
-        context: {
-          headers: {
-            authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
-          },
-        },
-      });
-      const { ethereum: ethereumNFTHolders, polygon: polygonNFTHolders } =
-        nftHoldersData || {};
-      setGroupUsers(
-        [
-          ...(ethereumNFTHolders?.TokenNft ?? []),
-          ...(polygonNFTHolders?.TokenNft ?? []),
-        ]
-          ?.map(({ tokenBalances }) => {
-            if (!tokenBalances) return;
-            return tokenBalances;
-          })
-          ?.flat(1)
-          ?.filter(Boolean)
-          ?.filter((value, index, array) => {
-            return (
-              array.findIndex(
-                (item) => item?.owner?.identity === value?.owner?.identity
-              ) === index
-            );
-          })
-      );
+      switch (recommendMode) {
+        case "nfts":
+          setFocusGroup(nftAddress);
+          const { data: nftHoldersData } = await client.query({
+            query: getNFTHolders,
+            variables: {
+              address: [nftAddress],
+            },
+            context: {
+              headers: {
+                authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
+              },
+            },
+          });
+          const { ethereum: ethereumNFTHolders, polygon: polygonNFTHolders } =
+            nftHoldersData || {};
+          setGroupUsers(
+            [
+              ...(ethereumNFTHolders?.TokenNft ?? []),
+              ...(polygonNFTHolders?.TokenNft ?? []),
+            ]
+              ?.map(({ tokenBalances }) => {
+                if (!tokenBalances) return;
+                return tokenBalances;
+              })
+              ?.flat(1)
+              ?.filter(Boolean)
+              ?.filter((value, index, array) => {
+                return (
+                  array.findIndex(
+                    (item) => item?.owner?.identity === value?.owner?.identity
+                  ) === index
+                );
+              })
+          );
+          break;
+        case "poaps":
+          setFocusGroup(eventId);
+          const { data: poapHoldersData } = await client.query({
+            query: getPoapHolders,
+            variables: {
+              eventId,
+            },
+            context: {
+              headers: {
+                authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
+              },
+            },
+          });
+          const { Poaps } = poapHoldersData || {};
+          setGroupUsers(
+            Poaps?.Poap?.filter((value, index, array) => {
+              return (
+                array.findIndex(
+                  (item) => item?.owner?.identity === value?.owner?.identity
+                ) === index
+              );
+            })
+          );
+        default:
+          break;
+      }
       setModalLoading(false);
     } catch (e) {
       console.log("error fetching nft holders ...", e);
@@ -123,13 +167,13 @@ const EnhancementAPIs = () => {
             ${recommendMode === "nfts" ? "bg-purple-500" : "bg-purple-400"}
             `}
           />
-          {/* <Button
+          <Button
             text="POAPs"
             onClick={() => setRecommendMode("poaps")}
             className={`
             ${recommendMode === "poaps" ? "bg-purple-500" : "bg-purple-400"}
             `}
-          /> */}
+          />
         </div>
       </div>
       <div className="flex flex-col items-start">
@@ -147,27 +191,47 @@ const EnhancementAPIs = () => {
         />
       </div>
       <div className="mt-3 p-2 grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-2">
-        {profileGroups.map(({ tokenAddress, tokenNfts }, index) => (
-          <div key={index}>
-            <img
-              src={tokenNfts?.contentValue?.image?.small ?? "/fallback.png"}
-              alt="Token image"
-              className="cursor-pointer"
-              onClick={() => fetchProfileUsers(tokenAddress)}
-            />
-            <div className="mt-4 flex justify-between">
-              <h3 className="text-sm text-gray-700">
-                <b>
-                  {tokenNfts?.metaData?.name?.slice(0, 50)}
-                  {tokenNfts?.metaData?.name?.length > 50 && "..."}
-                </b>
-              </h3>
+        {recommendMode === "nfts" &&
+          profileGroups.map(({ tokenAddress, tokenNfts }, index) => (
+            <div key={index}>
+              <img
+                src={tokenNfts?.contentValue?.image?.small ?? "/fallback.png"}
+                alt="Token image"
+                className="cursor-pointer"
+                onClick={() => fetchProfileUsers({ tokenAddress })}
+              />
+              <div className="mt-4 flex justify-between">
+                <h3 className="text-sm text-gray-700">
+                  <b>
+                    {tokenNfts?.metaData?.name?.slice(0, 50)}
+                    {tokenNfts?.metaData?.name?.length > 50 && "..."}
+                  </b>
+                </h3>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        {recommendMode === "poaps" &&
+          profileGroups.map(({ eventId, image, name }, index) => (
+            <div key={index}>
+              <img
+                src={image ?? "/fallback.png"}
+                alt="Token image"
+                className="cursor-pointer"
+                onClick={() => fetchProfileUsers({ eventId })}
+              />
+              <div className="mt-4 flex justify-between">
+                <h3 className="text-sm text-gray-700">
+                  <b>
+                    {name?.slice(0, 50)}
+                    {name?.length > 50 && "..."}
+                  </b>
+                </h3>
+              </div>
+            </div>
+          ))}
         {loading && <Loading className="mt-4" />}
         <Modal
-          isOpen={focusGroup.length > 0}
+          isOpen={focusGroup?.length > 0}
           onRequestClose={() => setFocusGroup("")}
           style={{
             overlay: {
@@ -180,7 +244,7 @@ const EnhancementAPIs = () => {
             },
           }}
         >
-          <b className="text-lg">List of Holders</b>
+          <b className="text-lg">Community</b>
           <div className="container mt-2">
             {groupUsers.map(({ owner }, index) => (
               <div key={index} className="row border-b-2 py-2">
@@ -189,7 +253,11 @@ const EnhancementAPIs = () => {
                   {owner?.socials?.length > 0 && (
                     <>
                       {" · "}
-                      {owner?.socials?.[0]?.profileName}
+                      {
+                        owner?.socials?.find(
+                          ({ dappName }) => dappName === "lens"
+                        )?.profileName
+                      }
                     </>
                   )}
                 </p>
