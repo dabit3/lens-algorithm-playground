@@ -40,7 +40,7 @@ export default function Home() {
            ${view === "enhancements" ? "text-black" : "text-gray-400 "}
            `}
             >
-              EnhancementAPIs
+              Enhancements
             </p>
           </button>
         </div>

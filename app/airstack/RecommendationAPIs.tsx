@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { Loading } from "../components/Loading";

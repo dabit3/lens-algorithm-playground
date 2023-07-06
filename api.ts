@@ -107,6 +107,16 @@ export const getNFTs = gql`
     ) {
       TokenBalance {
         tokenAddress
+        tokenNfts {
+          contentValue {
+            image {
+              small
+            }
+          }
+          metaData {
+            name
+          }
+        }
       }
     }
     polygon: TokenBalances(
@@ -121,6 +131,16 @@ export const getNFTs = gql`
     ) {
       TokenBalance {
         tokenAddress
+        tokenNfts {
+          contentValue {
+            image {
+              small
+            }
+          }
+          metaData {
+            name
+          }
+        }
       }
     }
   }
@@ -142,6 +162,7 @@ export const getNFTHolders = gql`
               profileName
               dappName
             }
+            identity
           }
         }
       }
@@ -160,6 +181,7 @@ export const getNFTHolders = gql`
               profileName
               dappName
             }
+            identity
           }
         }
       }
