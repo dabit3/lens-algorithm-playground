@@ -35,7 +35,7 @@ export const getRecommendationsByTokenTransfers = gql`
       input: {
         filter: { _or: { from: { _in: $address }, to: { _in: $address } } }
         blockchain: ethereum
-        limit: 10
+        limit: 200
       }
     ) {
       TokenTransfer {
@@ -63,7 +63,7 @@ export const getRecommendationsByTokenTransfers = gql`
       input: {
         filter: { _or: { from: { _in: $address }, to: { _in: $address } } }
         blockchain: polygon
-        limit: 10
+        limit: 200
       }
     ) {
       TokenTransfer {
@@ -184,6 +184,80 @@ export const getNFTHolders = gql`
             identity
           }
         }
+      }
+    }
+  }
+`;
+
+export const getPoaps = gql`
+  query GetAllPOAPs($address: [Identity!]) {
+    Poaps(
+      input: {
+        filter: { owner: { _in: $address } }
+        blockchain: ALL
+        limit: 200
+      }
+    ) {
+      Poap {
+        id
+        eventId
+        poapEvent {
+          eventName
+          eventURL
+          startDate
+          endDate
+          country
+          city
+          contentValue {
+            image {
+              extraSmall
+              large
+              medium
+              original
+              small
+            }
+          }
+        }
+        owner {
+          identity
+          primaryDomain {
+            name
+          }
+          addresses
+        }
+      }
+    }
+  }
+`;
+
+export const getPoapHolders = gql`
+  query GetAllAddressesSocialsAndENSOfPOAP($eventId: [String!]) {
+    Poaps(
+      input: {
+        filter: { eventId: { _in: $eventId } }
+        blockchain: ALL
+        limit: 200
+      }
+    ) {
+      Poap {
+        owner {
+          identity
+          primaryDomain {
+            name
+          }
+          domains {
+            name
+          }
+          socials {
+            profileName
+            dappName
+            dappSlug
+          }
+        }
+        poapEvent {
+          eventId
+        }
+        tokenId
       }
     }
   }

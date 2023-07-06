@@ -7,6 +7,8 @@ import { ApolloClient, InMemoryCache } from "@apollo/client";
 import {
   getNFTHolders,
   getNFTs,
+  getPoapHolders,
+  getPoaps,
   getRecommendationsByTokenTransfers,
 } from "../../api";
 
@@ -86,6 +88,37 @@ export function RecommendationAPIs() {
           );
           break;
         case "poaps":
+          const { data: poapsData } = await client.query({
+            query: getPoaps,
+            variables: {
+              address: lensHandle,
+            },
+            context: {
+              headers: {
+                authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
+              },
+            },
+          });
+          const { Poaps } = poapsData || {};
+          const { data: poapHoldersData } = await client.query({
+            query: getPoapHolders,
+            variables: {
+              eventId: Poaps?.Poap.map(({ eventId }) => eventId) ?? [],
+            },
+            context: {
+              headers: {
+                authorization: process.env.NEXT_PUBLIC_AIRSTACK_KEY || "",
+              },
+            },
+          });
+          setFollowList(
+            poapHoldersData?.Poaps?.Poap?.map(
+              ({ owner }) =>
+                owner?.socials?.find(({ dappName }) => dappName === "lens")
+                  ?.profileName
+            )
+          );
+          break;
         case "transfers":
         default:
           const { data: tokenTransfersData } = await client.query({
