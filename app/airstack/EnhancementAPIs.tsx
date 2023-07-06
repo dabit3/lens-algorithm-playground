@@ -81,17 +81,22 @@ const EnhancementAPIs = () => {
     }
   };
 
-  const fetchProfileUsers = async ({ nftAddress, eventId }) => {
+  const fetchProfileUsers = async ({
+    tokenAddress,
+    eventId,
+  }:
+    | { tokenAddress: string; eventId?: string }
+    | { tokenAddress?: string; eventId: string }) => {
     setModalLoading(true);
     setGroupUsers([]);
     try {
       switch (recommendMode) {
         case "nfts":
-          setFocusGroup(nftAddress);
+          if (tokenAddress) setFocusGroup(tokenAddress);
           const { data: nftHoldersData } = await client.query({
             query: getNFTHolders,
             variables: {
-              address: [nftAddress],
+              address: [tokenAddress],
             },
             context: {
               headers: {
@@ -122,7 +127,7 @@ const EnhancementAPIs = () => {
           );
           break;
         case "poaps":
-          setFocusGroup(eventId);
+          if (eventId) setFocusGroup(eventId);
           const { data: poapHoldersData } = await client.query({
             query: getPoapHolders,
             variables: {
