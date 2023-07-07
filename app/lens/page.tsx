@@ -211,7 +211,7 @@ export default function Home() {
                 <div className="mt-6">
                   {
                     publications.map(publication => (
-                      <div key={publication.id} className="mb-2 [&>div>div>div>div]:pb-2">
+                      <div key={publication.id} className="mb-2">
                         <Publication
                           publicationId={publication.id}
                         />

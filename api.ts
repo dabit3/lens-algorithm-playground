@@ -305,6 +305,16 @@ export const profiles = gql`
         id
         handle
         name
+        picture {
+          ... on NftImage {
+            uri
+          }
+          ... on MediaSet {
+            original {
+              url
+            }
+          }
+        }
       }
     }
   }

@@ -16,7 +16,7 @@ const client = new ApolloClient({
 
 const EnhancementAPIs = () => {
   const [recommendMode, setRecommendMode] = useState("nfts");
-  const [lensHandle, setLensHandle] = useState("");
+  let [lensHandle, setLensHandle] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [profileGroups, setProfileGroups] = useState<any[]>([]); // List of relevant groups
@@ -24,7 +24,10 @@ const EnhancementAPIs = () => {
   const [groupUsers, setGroupUsers] = useState<any[]>([]); // List of users in the focused group
 
   const fetchProfileGroups = async () => {
-    if (!lensHandle || !lensHandle.includes(".lens")) return;
+    if (!lensHandle) return
+    if (!lensHandle.includes(".lens")) {
+      lensHandle = lensHandle + ".lens"
+    }
     setProfileGroups([]);
     try {
       setLoading(true);

@@ -5,6 +5,9 @@ import { Button } from "../components/Button";
 import { Loading } from "../components/Loading";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import {
+  ProfileListItem, Profile
+} from '@lens-protocol/widgets-react'
+import {
   getNFTHolders,
   getNFTs,
   getPoapHolders,
@@ -21,12 +24,16 @@ const client = new ApolloClient({
 
 export function RecommendationAPIs() {
   const [recommendMode, setRecommendMode] = useState("transfers");
-  const [lensHandle, setLensHandle] = useState("");
+  let [lensHandle, setLensHandle] = useState("");
   const [loading, setLoading] = useState(false);
   const [followList, setFollowList] = useState<any[]>([]);
+  const [currentHandle, setCurrentHandle] = useState('');
 
   const fetchRecommendations = async () => {
-    if (!lensHandle || !lensHandle.includes(".lens")) return;
+    if (!lensHandle) return
+    if (!lensHandle.includes(".lens")) {
+      lensHandle = lensHandle + ".lens"
+    }
     setFollowList([]);
     try {
       setLoading(true);
@@ -67,6 +74,9 @@ export function RecommendationAPIs() {
               },
             },
           });
+
+          console.log('nftHoldersData: ', nftHoldersData)
+
           const { ethereum: ethereumNFTHolders, polygon: polygonNFTHolders } =
             nftHoldersData || {};
           setFollowList(
@@ -176,7 +186,7 @@ export function RecommendationAPIs() {
       setLoading(false);
     }
   };
-
+  console.log('followList: ', followList)
   return (
     <div>
       <p className="font-bold mt-4">Recommendation Engine</p>
@@ -220,11 +230,27 @@ export function RecommendationAPIs() {
           onClick={fetchRecommendations}
         />
       </div>
-      <div className="mt-3 p-2">
-        {followList.map((lensProfile, index) => (
-          <p key={index}>{lensProfile}</p>
-        ))}
-        {loading && <Loading className="mt-4" />}
+      <div className="flex">
+        <div className="mt-3 p-2 w-[400px]">
+          {followList.map((lensProfile, index) => (
+            <div key={index}>
+              <ProfileListItem
+                onClick={() => setCurrentHandle(lensProfile)}
+                handle={lensProfile}
+              />
+            </div>
+          ))}
+          {loading && <Loading className="mt-4" />}
+        </div>
+        {
+          currentHandle && (
+            <div className="ml-8">
+              <Profile
+                handle={currentHandle}
+              />
+            </div>
+          )
+        }
       </div>
     </div>
   );

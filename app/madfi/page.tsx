@@ -5,6 +5,7 @@ import { Input } from '../components/Input'
 import { client, profileByHandle, profiles as profilesQuery } from '../../api'
 import { Loading } from '../components/Loading'
 import { Profile } from '@lens-protocol/widgets-react'
+import { ProfileListItem } from '@lens-protocol/widgets-react'
 
 export default function Home() {
   let [handle, setHandle] = useState('')
@@ -77,18 +78,15 @@ export default function Home() {
           <div className="mt-5">
             {
               profiles.map((profile, index) => (
-                <p
-                key={profile.id}
-                className={`
-                mt-2 cursor-pointer
-                ${selectedIndex === index && 'text-green-500'}
-                `}
-                onClick={() => {
-                  setCurrentHandle(profile.handle);
-                  setSelectedIndex(index)
-                }}>
-                  {profile.handle}
-                </p>
+                <ProfileListItem
+                  key={profile.id}
+                  profile={profile}
+                  onClick={() => {
+                    setCurrentHandle(profile.handle)
+                    setSelectedIndex(index)
+                  }}
+                />
+               
               ))
             }
           </div>

@@ -37,7 +37,6 @@ export function ProfileAPIs() {
           },
         },
       });
-      console.log("response: ", response);
       const { Domains, Socials } = response.data;
       if (Domains.Domain) {
         setDomains(Domains.Domain);

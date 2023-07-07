@@ -15,7 +15,7 @@ You so not need any credentials to run this app to interact with Lens or Karma3.
 
 The APIs that require an API key are MadFi and Airstack.
 
-You can get an Airstack API key by creating an account here.
+You can get an Airstack API key by creating an account [here](https://app.airstack.xyz).
 
 You can request one for MadFi by reaching out to their team, you can learn more [here](https://app.airstack.xyz/)
 

@@ -11,7 +11,7 @@
   "dependencies": {
     "@airstack/airstack-react": "^0.4.2",
     "@apollo/client": "^3.7.16",
-    "@lens-protocol/widgets-react": "^0.0.18",
+    "@lens-protocol/widgets-react": "^0.0.21",
     "@types/node": "20.3.2",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",
