@@ -13,7 +13,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export function ProfileAPIs() {
+export function ERC6551APIs() {
   const [domains, setDomains] = useState<any>([]);
   const [socials, setSocials] = useState<any>([]);
   const [addresses, setAddresses] = useState<any>([]); // List of address attach to `address` state (input)
@@ -59,7 +59,9 @@ export function ProfileAPIs() {
   }
   return (
     <div className="mt-4">
-      <p className="font-bold mt-4 mb-4">Resolving Social Profiles</p>
+      <p className="font-bold mt-4 mb-4">
+        Get ERC6551 Accounts By Lens Profile
+      </p>
       <div className="flex flex-col items-start">
         <Input
           placeholder="Ethereum address, Lens Profile, or ENS"

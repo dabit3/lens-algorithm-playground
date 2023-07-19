@@ -8,20 +8,14 @@ export const client = new ApolloClient({
 });
 
 export const getSocials = gql`
-  query GetSocials($address: [Identity!]) {
-    Socials(
-      input: { filter: { identity: { _in: $address } }, blockchain: ethereum }
-    ) {
-      Social {
+  query MyQuery($address: Identity!) {
+    Wallet(input: { identity: $address, blockchain: ethereum }) {
+      addresses
+      socials {
+        dappName
         profileName
-        dappName
       }
-    }
-    Domains(
-      input: { filter: { owner: { _in: $address } }, blockchain: ethereum }
-    ) {
-      Domain {
-        dappName
+      domains {
         name
       }
     }
