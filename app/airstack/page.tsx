@@ -18,7 +18,7 @@ export default function Home() {
             <p
               className={`
         mr-2 rounded-lg px-5 py-2 bg-slate-200
-         ${view === "profiles" ? "text-black" : "text-gray-400"}
+         ${view === "erc6551" ? "text-black" : "text-gray-400"}
         `}
             >
               ERC6551

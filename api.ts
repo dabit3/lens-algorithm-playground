@@ -257,6 +257,53 @@ export const getPoapHolders = gql`
   }
 `;
 
+export const erc6551UserBalance = gql`
+  query MyQuery($owner: Identity!) {
+    TokenBalances(
+      input: {
+        filter: {
+          owner: { _eq: $owner }
+          tokenType: { _in: [ERC1155, ERC721] }
+        }
+        blockchain: ethereum
+        limit: 200
+      }
+    ) {
+      TokenBalance {
+        tokenNfts {
+          erc6551Accounts {
+            address {
+              addresses
+              tokenBalances {
+                tokenNfts {
+                  address
+                  contentValue {
+                    image {
+                      original
+                    }
+                  }
+                  type
+                  tokenId
+                }
+              }
+              socials {
+                dappName
+                profileName
+                identity
+              }
+            }
+          }
+          contentValue {
+            image {
+              original
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const challenge = gql`
   query Challenge($address: EthereumAddress!) {
     challenge(request: { address: $address }) {
