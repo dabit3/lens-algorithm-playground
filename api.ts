@@ -18,6 +18,9 @@ export const getSocials = gql`
       domains {
         name
       }
+      xmtp {
+        isXMTPEnabled
+      }
     }
   }
 `;

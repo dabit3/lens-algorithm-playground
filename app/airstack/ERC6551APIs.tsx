@@ -48,7 +48,6 @@ export function ERC6551APIs() {
       setLoading(false);
     }
   }
-  console.log(nfts);
   return (
     <div className="mt-4">
       <p className="font-bold mt-4 mb-4">Get ERC6551 Accounts</p>
