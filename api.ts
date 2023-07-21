@@ -167,7 +167,7 @@ export const getNFTHolders = gql`
     polygon: TokenNfts(
       input: {
         filter: { address: { _in: $address } }
-        blockchain: ethereum
+        blockchain: polygon
         limit: 200
       }
     ) {
