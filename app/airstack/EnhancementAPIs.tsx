@@ -24,9 +24,9 @@ const EnhancementAPIs = () => {
   const [groupUsers, setGroupUsers] = useState<any[]>([]); // List of users in the focused group
 
   const fetchProfileGroups = async () => {
-    if (!lensHandle) return
+    if (!lensHandle) return;
     if (!lensHandle.includes(".lens")) {
-      lensHandle = lensHandle + ".lens"
+      lensHandle = lensHandle + ".lens";
     }
     setProfileGroups([]);
     try {
@@ -200,7 +200,7 @@ const EnhancementAPIs = () => {
       </div>
       <div className="mt-3 p-2 grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-2">
         {recommendMode === "nfts" &&
-          profileGroups.map(({ tokenAddress, tokenNfts }, index) => (
+          profileGroups?.map(({ tokenAddress, tokenNfts }, index) => (
             <div key={index}>
               <img
                 src={tokenNfts?.contentValue?.image?.small ?? "/fallback.png"}
@@ -219,7 +219,7 @@ const EnhancementAPIs = () => {
             </div>
           ))}
         {recommendMode === "poaps" &&
-          profileGroups.map(({ eventId, image, name }, index) => (
+          profileGroups?.map(({ eventId, image, name }, index) => (
             <div key={index}>
               <img
                 src={image ?? "/fallback.png"}

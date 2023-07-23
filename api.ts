@@ -8,21 +8,18 @@ export const client = new ApolloClient({
 });
 
 export const getSocials = gql`
-  query GetSocials($address: [Identity!]) {
-    Socials(
-      input: { filter: { identity: { _in: $address } }, blockchain: ethereum }
-    ) {
-      Social {
+  query MyQuery($address: Identity!) {
+    Wallet(input: { identity: $address, blockchain: ethereum }) {
+      addresses
+      socials {
+        dappName
         profileName
-        dappName
       }
-    }
-    Domains(
-      input: { filter: { owner: { _in: $address } }, blockchain: ethereum }
-    ) {
-      Domain {
-        dappName
+      domains {
         name
+      }
+      xmtp {
+        isXMTPEnabled
       }
     }
   }
@@ -170,7 +167,7 @@ export const getNFTHolders = gql`
     polygon: TokenNfts(
       input: {
         filter: { address: { _in: $address } }
-        blockchain: ethereum
+        blockchain: polygon
         limit: 200
       }
     ) {
@@ -258,6 +255,53 @@ export const getPoapHolders = gql`
           eventId
         }
         tokenId
+      }
+    }
+  }
+`;
+
+export const erc6551UserBalance = gql`
+  query MyQuery($owner: Identity!) {
+    TokenBalances(
+      input: {
+        filter: {
+          owner: { _eq: $owner }
+          tokenType: { _in: [ERC1155, ERC721] }
+        }
+        blockchain: ethereum
+        limit: 200
+      }
+    ) {
+      TokenBalance {
+        tokenNfts {
+          erc6551Accounts {
+            address {
+              addresses
+              tokenBalances {
+                tokenNfts {
+                  address
+                  contentValue {
+                    image {
+                      original
+                    }
+                  }
+                  type
+                  tokenId
+                }
+              }
+              socials {
+                dappName
+                profileName
+                identity
+              }
+            }
+          }
+          contentValue {
+            image {
+              original
+            }
+          }
+        }
       }
     }
   }

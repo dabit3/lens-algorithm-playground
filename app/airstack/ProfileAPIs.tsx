@@ -16,6 +16,8 @@ const client = new ApolloClient({
 export function ProfileAPIs() {
   const [domains, setDomains] = useState<any>([]);
   const [socials, setSocials] = useState<any>([]);
+  const [isXMTPEnabled, setIsXMTPEnabled] = useState<boolean>(false);
+  const [addresses, setAddresses] = useState<any>([]); // List of address attach to `address` state (input)
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -37,14 +39,24 @@ export function ProfileAPIs() {
           },
         },
       });
-      const { Domains, Socials } = response.data;
-      if (Domains.Domain) {
-        setDomains(Domains.Domain);
+      const { Wallet } = response.data;
+      if (Wallet.addresses) {
+        setAddresses(Wallet.addresses);
       }
-      if (Socials.Social) {
-        setSocials(Socials.Social);
+      if (Wallet.domains) {
+        setDomains(Wallet.domains);
       }
-      if (!Socials.Social && !Domains.Domain) {
+      if (Wallet.socials) {
+        setSocials(Wallet.socials);
+      }
+      if (Wallet?.xmtp?.[0]?.isXMTPEnabled) {
+        setIsXMTPEnabled(Wallet?.xmtp?.[0]?.isXMTPEnabled);
+      }
+      if (
+        !Wallet.domains &&
+        !Wallet.socials &&
+        !Wallet?.xmtp?.[0]?.isXMTPEnabled
+      ) {
         setMessage("No profiles for this address.");
       }
       setLoading(false);
@@ -70,9 +82,17 @@ export function ProfileAPIs() {
           className="bg-green-500 mt-2 mb-4"
         />
       </div>
+      {Boolean(addresses.length) && (
+        <>
+          <p className="text-red-500 text-lg">Addreses</p>
+          {addresses.map((addr) => (
+            <p key={addr}>{addr}</p>
+          ))}
+        </>
+      )}
       {Boolean(domains.length) && (
         <>
-          <p className="text-green-500 text-lg">Domains</p>
+          <p className="mt-4 text-green-500 text-lg">Domains</p>
           {domains.map((domain) => (
             <p key={domain.name}>{domain.name}</p>
           ))}
@@ -87,6 +107,12 @@ export function ProfileAPIs() {
               <p>Handle: {social.profileName}</p>
             </div>
           ))}
+        </>
+      )}
+      {isXMTPEnabled && (
+        <>
+          <p className="mt-4 text-purple-500 text-lg">XMTP</p>
+          <p>{isXMTPEnabled ? "Enabled" : "Disabled"}</p>
         </>
       )}
       {loading && <Loading className="mt-4" />}
