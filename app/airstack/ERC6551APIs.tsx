@@ -60,7 +60,7 @@ export function ERC6551APIs() {
           }}
         />
         <Button
-          text="Get social profiles"
+          text="Get token bound accounts"
           onClick={fetchProfiles}
           className="bg-green-500 mt-2 mb-4"
         />
